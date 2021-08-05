@@ -1,6 +1,3 @@
-////////////////////////////////////////////////
-//THE TEST SERVER IS RUNNING ON LOCALHOST:3000//
-////////////////////////////////////////////////
 
 // PROBLEM 1
 /*
@@ -11,6 +8,8 @@
 
 // CODE HERE
 
+const sayHelloButton = document.querySelector("#say-hello-button")
+const buttons = document.querySelectorAll('button')
 
 // PROBLEM 2
 /*
@@ -20,6 +19,15 @@
 */
 
 // CODE HERE
+
+function darkTheme(event) {
+    event.target.style.backgroundColor = "black";
+    event.target.style.color = "white";
+}
+
+
+
+
 
 
 // PROBLEM 3
@@ -32,6 +40,16 @@
 */
 
 // CODE HERE
+
+function lightTheme(event) {
+    event.target.style.backgroundColor = "#EFEFEF";
+    event.target.style.color = "black";
+}
+
+for (let i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener('mouseover', darkTheme);
+    buttons[i].addEventListener('mouseout',lightTheme)
+}
 
 
 // PROBLEM 4
@@ -54,10 +72,11 @@ const sayHello = () => {
 
 // CODE HERE
 
+sayHelloButton.addEventListener('click', sayHello);
 
 // PROBLEM 5 
 /*
-    Now that we have attached a few event listeners why dont we try adding a request? 
+    Now that we have attached a few event listeners why don't we try adding a request? 
     
     Below you will find an event listener on a button. 
     
@@ -67,7 +86,15 @@ const sayHello = () => {
 */ 
 
 const ohMy = () => {
-    // YOUR CODE HERE
+    axios.get('http://localhost:3000/animals' )
+        .then(res => {
+            for (criatura of res.data) {
+                console.log(criatura)
+                const animal = document.createElement('p')
+                animal.textContent = `${criatura}`
+                document.querySelector('body').appendChild(animal)
+            }
+        })
 }
 
 document.getElementById('animals-button').addEventListener('click', ohMy)
@@ -87,8 +114,16 @@ document.getElementById('animals-button').addEventListener('click', ohMy)
 */
 
 const repeatMyParam = () => {
-    //YOUR CODE HERE
+    axios.get(`http://localhost:3000/repeat/monkey`)
+        .then(res => {
+            console.log(res.data)
+            document.querySelector('#repeat-text').textContent = res.data
+            document.querySelector('#repeat-text').style.display = 'block';
+            document.querySelector('#repeat-text').style.backgroundColor = 'green';
+        })
 }
+
+document.querySelector("#repeat-button").addEventListener('click',repeatMyParam);
 
 // PROBLEM 7
 /*
@@ -112,6 +147,14 @@ const repeatMyParam = () => {
 
 // CODE HERE
 
+const queryTest = () => {
+    axios.get('http://localhost:3000/query-test/?who=yourDaddy&monkey=fun')
+        .then( res => {
+            console.log(res.data)
+        })
+}
+
+document.querySelector('#query-button').addEventListener('click', queryTest);
 
 
 ////////////////
@@ -164,3 +207,38 @@ const repeatMyParam = () => {
 */
 
 // CODE HERE 
+
+function createFood(event) {
+
+    event.preventDefault();
+
+    const foodInput = document.querySelector('input');
+    const body = {
+        newFood : foodInput.value
+    }
+    axios.post('http://localhost:3000/food', body)
+        .then( res => {
+            console.log(res.data);
+            foodInput.value = ""
+
+            if (!!document.querySelector('ol')) {
+                document.querySelector('ol').remove()
+            }
+
+            const list = document.createElement('ol')
+            const title = document.createElement('p')
+            title.textContent = "Food List"
+            list.appendChild(title)
+            
+            document.querySelector('body').appendChild(list)
+
+            for (item of res.data) {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${item}`
+                list.appendChild(listItem)
+            }
+        })
+}
+
+const newFoodLister = document.querySelector('form')
+newFoodLister.addEventListener('submit', createFood)
